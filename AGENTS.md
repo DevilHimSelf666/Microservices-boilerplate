@@ -1,31 +1,62 @@
-# AGENTS.md — Repository Rules for Codex (Offline-Prod Microservices)
+# AGENTS.md — Codex Web Rules (Aspire-first, Offline-Prod Microservices)
 
 ## Mission
-Generate and maintain a working boilerplate repository for an enterprise microservices platform.
+Generate and maintain a **working, verifiable boilerplate repository** for an enterprise microservices platform.
 
 The repository MUST:
-- Build successfully (`dotnet build`)
-- Pass tests (`dotnet test`)
-- Build Docker images via compose (`docker compose -f infra/docker-compose.yml --env-file infra/.env.template build`)
+- Build successfully using `dotnet build`
+- Pass tests using `dotnet test`
+
+Docker-related artifacts MUST be generated correctly but MUST NOT be executed,
+because the Codex Web environment does NOT have Docker.
+
+---
+
+## FIRST PRINCIPLE — Aspire Template Selection (MANDATORY)
+
+Before generating ANY code, the agent MUST:
+
+1. Review the **latest official Microsoft documentation** for .NET Aspire templates.
+2. Identify which Aspire template is **most appropriate** for:
+   - A multi-service microservices solution
+   - API Gateway + UI + background services
+   - Local orchestration with offline production deployment
+3. Explicitly choose and briefly justify one of:
+   - `aspire-starter`
+   - Any newer or more specific official Aspire template (if documented)
+
+Only AFTER this evaluation may code generation begin.
+
+The selected template MUST be an **official Microsoft Aspire template**.
+
+---
 
 ## Target Stack
 - .NET: .NET 10
 - UI: Blazor Server
 - Gateway: YARP Reverse Proxy
-- Dev orchestration & defaults: .NET Aspire (AppHost + ServiceDefaults)
-- Workflow: Elsa (separate service; compile-safe stub is acceptable if version is unknown)
+- Dev orchestration & defaults: .NET Aspire
+  - AppHost
+  - ServiceDefaults
+- Workflow: Elsa (separate service; compile-safe stub acceptable)
 - Messaging: RabbitMQ
-- Primary DB: SQL Server (SQL Authentication only)
-- Centralized logs: MongoDB
+- Primary Database: SQL Server (SQL Authentication ONLY)
+- Centralized logging: MongoDB
 - Observability: OpenTelemetry (OTLP exporter)
 
-## Environment Constraints
-- Development has internet access.
-- Production is OFFLINE (no outbound internet).
-- Deployment target (for now): Linux + Docker Compose.
-- SQL connection from containers MUST use hostname/IP + port (never use `.\Sql2022`).
+---
 
-## Repository Structure (Mandatory)
+## Environment Constraints
+- Development environment has internet access.
+- Production environment is OFFLINE (no outbound internet).
+- Deployment target (current): Linux + Docker Compose.
+- Codex Web environment DOES NOT have Docker.
+- SQL connections from containers MUST use hostname/IP + port.
+- NEVER use `.\Sql2022` or Windows Integrated Authentication.
+
+---
+
+## Repository Structure (EXACT — DO NOT DEVIATE)
 /
 ├─ src
 │  ├─ AppHost
@@ -38,7 +69,7 @@ The repository MUST:
 │  ├─ dar.api
 │  ├─ dba.api
 │  ├─ bud.api
-│  ├─ con.api
+│  ├─ ctr.api
 │  ├─ cos.api
 │  ├─ rap.api
 │  ├─ rde.api
@@ -55,80 +86,134 @@ The repository MUST:
 ├─ azure-pipelines.yml
 ├─ README.md
 
+---
+
 ## Module Services (Required)
+
 Modules (one microservice each):
-ARC, DAR, DBA, BUD, CON, COS, RAP, RDE, REP, RRE, RST
+ARC, DAR, DBA, BUD, CTR, COS, RAP, RDE, REP, RRE, RST
 
 Each module service MUST:
 - Be ASP.NET Core Web API targeting .NET 10
 - Use minimal APIs
 - Reference `ServiceDefaults`
-- Expose these endpoints:
-  - GET `/`                     → service marker
-  - GET `/health`               → health checks
-  - GET `/api/{module}/ping`    → module marker
+- Expose:
+  - GET `/`
+  - GET `/health`
+  - GET `/api/{module}/ping`
+
+---
+
+## Aspire Service Registration Rules (MANDATORY)
+
+The Aspire **AppHost is the authoritative local orchestrator**.
+
+Requirements:
+- EVERY runnable service MUST be:
+  - Added to AppHost
+  - Referenced explicitly (project reference)
+- AppHost MUST register and orchestrate:
+  - Gateway
+  - Blazor Server UI
+  - Elsa.Server
+  - All module services (ARC, DAR, DBA, BUD, CTR, COS, RAP, RDE, REP, RRE, RST)
+
+Best-practice expectations:
+- Use the **recommended service registration APIs** for the selected Aspire template/version.
+- Avoid hardcoding service URLs where Aspire-managed configuration is appropriate.
+- Use AppHost to define service relationships and environment variables for local development.
+- Docker Compose is for runtime parity; Aspire is for dev orchestration and defaults.
+
+If Aspire APIs differ by version:
+- Choose the latest documented pattern
+- Briefly explain the choice in comments
+
+---
 
 ## Gateway Rules (YARP)
 - Gateway is the ONLY external entry point.
-- Configure YARP using `LoadFromConfig()` and `ReverseProxy` section in appsettings.json.
-- Provide complete routes/clusters for all module services under `/api/{module}/...`.
-- Implement correlation-id behavior:
-  - If request lacks `X-Correlation-ID`, generate one
-  - Forward it to downstream services
-  - Include it in logs
+- Configure YARP using `LoadFromConfig()` with routes/clusters in `appsettings.json`.
+- Provide routing for all module services under `/api/{module}/...`.
+- Implement Correlation ID behavior:
+  - Generate `X-Correlation-ID` if missing
+  - Propagate to downstream services
+  - Include in structured logs
 
-## SSO Rules (Org Package)
-- The organization provides an internal NuGet package with an extension method `AddSso(...)`.
-- The repository MUST compile WITHOUT this package.
+---
+
+## SSO Rules (Organization Package)
+- Organization provides internal NuGet package exposing `AddSso(...)`.
+- Repository MUST compile WITHOUT that package.
+
 Implementation requirement:
-- Create an `Auth` adapter layer with:
-  - `ISsoConfigurator` interface
-  - `NoopSsoConfigurator` default implementation
-- Add TODO markers where `AddSso` is expected to be invoked (Gateway and optionally services).
+- Create an authentication adapter layer:
+  - `ISsoConfigurator`
+  - `NoopSsoConfigurator`
+- Add TODO markers where `AddSso` must be wired (Gateway and optionally services).
 - Never hardcode secrets.
 
+---
+
 ## Observability Rules
-- Implement OpenTelemetry in `ServiceDefaults`:
-  - traces + metrics
-  - OTLP exporter
-- Read exporter endpoint from environment variable:
-  - `OTEL_EXPORTER_OTLP_ENDPOINT`
-- Compose must include `otel-collector` and optional `jaeger` UI.
-- Logs should be structured and include:
-  - service name
-  - environment
-  - correlation id
-  - request id (if available)
+- OpenTelemetry configured in `ServiceDefaults`
+- Traces + metrics enabled
+- OTLP exporter
+- Exporter endpoint read from `OTEL_EXPORTER_OTLP_ENDPOINT`
+- Docker Compose MUST define:
+  - otel-collector
+  - optional jaeger (UI only; not executed by Codex)
+
+---
 
 ## Messaging Rules (RabbitMQ)
-- Compose includes RabbitMQ (management enabled).
-- Provide code skeleton in each service:
+- Docker Compose MUST define RabbitMQ (management enabled).
+- Code MUST include skeletons for:
+  - Event contracts (versioned)
   - Publisher
   - Consumer
-  - Event contracts (versioned, e.g. v1)
-- Include skeleton notes for:
-  - Outbox pattern
-  - Idempotent consumer handling
-  - Dead-letter queues (DLQ)
-These can be TODO but must exist as stubs.
+- Include TODO stubs for:
+  - Transactional Outbox
+  - Idempotent consumers
+  - Dead-letter queues
+
+---
 
 ## Offline Production Guardrails
-- `nuget.config` must support an internal feed override and deterministic restores.
-- `docker-compose.yml` should use explicit image tags.
+- `nuget.config` must support internal feed override.
+- Docker images must use explicit tags.
 - `infra/.env.template` must include:
-  - RabbitMQ user/pass
   - SQL passwords per service
+  - RabbitMQ credentials
 - No runtime dependency on external internet.
+
+---
 
 ## CI/CD (Azure DevOps)
 - Provide `azure-pipelines.yml` that:
-  - restores, builds, tests
-  - builds Docker images
-  - publishes artifacts (compose + env template)
-- Must work with self-hosted agents (no cloud dependencies assumed).
+  - Restores, builds, tests
+  - Defines Docker build steps (definition only; not executed here)
+- Must be compatible with self-hosted agents.
 
-## Output Expectations for Any Code Generation
-When generating code or modifying repo:
-- Keep structure exact
-- Ensure build/test/compose build succeed
-- If something is ambiguous, ask before generating
+---
+
+## Codex Web Verification Rules (CRITICAL)
+Codex MUST run:
+- `dotnet build`
+- `dotnet test`
+
+Codex MUST NOT attempt:
+- `docker`
+- `docker compose`
+
+Docker correctness is validated by:
+- File structure
+- Configuration correctness
+- README instructions
+
+---
+
+## Output Expectations
+When generating code:
+- Maintain exact structure
+- Ensure build/tests pass
+- If anything is ambiguous, ASK BEFORE generating
