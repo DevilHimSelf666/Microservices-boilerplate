@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting" Version="9.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Gateway/Gateway.csproj" />
+    <ProjectReference Include="../Ui.BlazorServer/Ui.BlazorServer.csproj" />
+    <ProjectReference Include="../Elsa.Server/Elsa.Server.csproj" />
+    <ProjectReference Include="../../services/arc.api/ARC.Api.csproj" />
+    <ProjectReference Include="../../services/dar.api/DAR.Api.csproj" />
+    <ProjectReference Include="../../services/dba.api/DBA.Api.csproj" />
+    <ProjectReference Include="../../services/bud.api/BUD.Api.csproj" />
+    <ProjectReference Include="../../services/ctr.api/CTR.Api.csproj" />
+    <ProjectReference Include="../../services/cos.api/COS.Api.csproj" />
+    <ProjectReference Include="../../services/rap.api/RAP.Api.csproj" />
+    <ProjectReference Include="../../services/rde.api/RDE.Api.csproj" />
+    <ProjectReference Include="../../services/rep.api/REP.Api.csproj" />
+    <ProjectReference Include="../../services/rre.api/RRE.Api.csproj" />
+    <ProjectReference Include="../../services/rst.api/RST.Api.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,77 @@
+<Solution>
+  <Folder Name="/services/" />
+  <Folder Name="/services/arc.api/">
+    <Project Path="services/arc.api/ARC.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/bud.api/">
+    <Project Path="services/bud.api/BUD.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/cos.api/">
+    <Project Path="services/cos.api/COS.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/ctr.api/">
+    <Project Path="services/ctr.api/CTR.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/dar.api/">
+    <Project Path="services/dar.api/DAR.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/dba.api/">
+    <Project Path="services/dba.api/DBA.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/rap.api/">
+    <Project Path="services/rap.api/RAP.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/rde.api/">
+    <Project Path="services/rde.api/RDE.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/rep.api/">
+    <Project Path="services/rep.api/REP.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/rre.api/">
+    <Project Path="services/rre.api/RRE.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/rst.api/">
+    <Project Path="services/rst.api/RST.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/AppHost/AppHost.csproj" />
+    <Project Path="src/Elsa.Server/Elsa.Server.csproj" />
+    <Project Path="src/Gateway/Gateway.csproj" />
+    <Project Path="src/ServiceDefaults/ServiceDefaults.csproj" />
+    <Project Path="src/Ui.BlazorServer/Ui.BlazorServer.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/arc.api.tests/">
+    <Project Path="tests/arc.api.tests/ARC.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/bud.api.tests/">
+    <Project Path="tests/bud.api.tests/BUD.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/cos.api.tests/">
+    <Project Path="tests/cos.api.tests/COS.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/ctr.api.tests/">
+    <Project Path="tests/ctr.api.tests/CTR.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/dar.api.tests/">
+    <Project Path="tests/dar.api.tests/DAR.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/dba.api.tests/">
+    <Project Path="tests/dba.api.tests/DBA.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/rap.api.tests/">
+    <Project Path="tests/rap.api.tests/RAP.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/rde.api.tests/">
+    <Project Path="tests/rde.api.tests/RDE.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/rep.api.tests/">
+    <Project Path="tests/rep.api.tests/REP.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/rre.api.tests/">
+    <Project Path="tests/rre.api.tests/RRE.Api.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/rst.api.tests/">
+    <Project Path="tests/rst.api.tests/RST.Api.Tests.csproj" />
+  </Folder>
+</Solution>
