@@ -15,6 +15,15 @@ This repository is an Aspire-first microservices scaffold targeting .NET 10. It 
 - Module APIs (ARC, DAR, DBA, BUD, CTR, COS, RAP, RDE, REP, RRE, RST) under `services/<module>.api`.
 - Tests for each module under `tests/<module>.api.tests`.
 
+### Elsa two-level approval sample
+- The Elsa server exposes a budget request workflow that models a real-world two-step approval for the **BUD** service.
+- Start a workflow instance:
+  - `POST /workflow/bud/expense-approvals` with body `{ "requestedBy": "jane.doe", "costCenter": "CC-1001", "amount": 12000, "description": "Modernization sprint" }`.
+- Complete approvals in order:
+  - Department manager: `POST /workflow/bud/expense-approvals/{id}/decisions` with `{ "role": "department-manager", "approver": "team.lead", "approve": true, "comments": "Fits roadmap" }`.
+  - Finance controller: `POST /workflow/bud/expense-approvals/{id}/decisions` with `{ "role": "finance-controller", "approver": "finance.ops", "approve": true, "comments": "Budget available" }`.
+- Retrieve status (current step, approvals, or rejection reason): `GET /workflow/bud/expense-approvals/{id}`.
+
 ## Running Locally (Aspire)
 1. Ensure .NET 10 SDK is installed.
 2. From the repo root run:
